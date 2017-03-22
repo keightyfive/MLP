@@ -83,9 +83,9 @@ void update_net_output(void);
 // static void update_neuron_output(struct neuron *);
 // static double derivative(struct neuron *);
 void train_net(double, double, int, double *);
-// TODO:
-void apply_batch_cumulations(double, double);
 double *get_outputs();
+void apply_batch_cumulations(double, double);
+// TODO:
 int load_net(char *);
 
 //int save_net(char *);
@@ -347,7 +347,7 @@ static double derivative(struct neuron * my_neuron)
 	return temp;
 }
 
-//
+// function to train ann using batch method  
 void train_net(double learning_rate, double momentum_rate, int batch, double *output_targets)
 {
 	int i, j, k;
@@ -429,7 +429,106 @@ void train_net(double learning_rate, double momentum_rate, int batch, double *ou
 	{
 		ann.no_of_batch_changes++;
 	}
+}//end void train_net()
+
+void apply_batch_cumulations(double learning_rate, double momentum_rate)
+{
+	int i, j, k;
+	struct layer *curr_layer;
+	double temp_weight;
+
+	for(i = ann.no_of_layers - 1; i >= 0; i--)
+	{
+		curr_layer = &ann.layers[i];
+		for(j = 0; j < curr_layer->no_of_neurons; j++)
+		{
+			// thresholds
+			temp_weight = curr_layer->neurons[j].threshold;
+			curr_layer->neurons[j].threshold += (learning_rate * (curr_layer->neurons[j].batch_threshold_change / ann.no_of_batch_changes)) + (momentum_rate * (curr_layer->neurons[j].threshold - curr_layer->neurons[j].old_threshold));
+		
+			curr_layer->neurons[j].old_threshold = temp_weight;
+			curr_layer->neurons[j].batch_threshold_change = 0;
+
+			// weights
+			for(k = 0; k < curr_layer->neurons[j].no_of_inputs; k++)
+			{
+				temp_weight = curr_layer->neurons[j].weights[k];
+				curr_layer->neurons[j].weights[k] += (learning_rate * (curr_layer->neurons[j].batch_weight_changes[k] / ann.no_of_batch_changes)) + (momentum_rate * (curr_layer->neurons[j].weights[k] - curr_layer->neurons[j].old_weights[k]));
+				curr_layer->neurons[j].old_weights[k] = temp_weight;
+				curr_layer->neurons[j].batch_weight_changes[k] = 0;
+			}
+		}
+	}
+}//end void apply_batch_cumulations()
+
+// function to get_output
+double *get_outputs()
+{
+	return ann.outputs;
 }
+
+int load_net(char *path)
+{
+	int i,j,k;
+	int temp_int;
+	double temp_double;
+	char temp_char;
+
+	int no_of_layers;
+	int no_of_neurons[MAX_NO_OF_LAYERS];
+	int no_of_inputs[MAX_NO_OF_LAYERS];
+	char axon_families[MAX_NO_OF_LAYERS];
+	double act_funct_flatnesses[MAX_NO_OF_LAYERS];
+
+	FILE *in_file;
+
+	if(!(in_file = fopen(path, "rb")))
+	return 1;
+
+	// read from file	
+	fread(&temp_int, sizeof(int), 1, in_file);
+	no_of_layers = temp_int;
+
+	// read from file
+	for(i = 0; i < no_of_layers; i++)
+	{	
+		fread(&temp_int, sizeof(int), 1, in_file);
+		no_of_neurons[i] = temp_int;
+
+		fread(&temp_int, sizeof(int), 1, in_file);
+		no_of_inputs[i] = temp_int;
+
+		fread(&temp_int, sizeof(char), 1, in_file);
+		axon_families[i] = temp_char;
+
+		fread(&temp_int, sizeof(double), 1, in_file);
+		act_funct_flatnesses[i] = temp_double;
+	}
+
+	create_ann(no_of_layers, no_of_neurons, no_of_inputs, axon_families, act_funct_flatnesses, 0);
+
+	// weights
+	for(i = 0; i < no_of_layers; i++)
+	{
+		for(j = 0; j < no_of_neurons[i]; j++)
+		{
+			fread(&temp_double, sizeof(double), 1, in_file);
+			ann.layers[i].neurons[j].threshold = temp_double;
+			
+			for(k = 0; k < no_of_inputs[i]; k++)
+			{
+				fread(&temp_double, sizeof(double), 1, in_file);
+				ann.layers[i].neurons[j].weights[k] = temp_double;
+			}
+		}
+	}
+
+	// close file
+	fclose(in_file);
+
+	return 0;
+}
+
 
 //-------------------------------------------------------------------------
 // MAIN function
@@ -481,8 +580,32 @@ int main(int argc, char *argv[])
 		train_net(0, 0, 1, output_targets);
 		counter++;
 
+		if(counter == 100)
+		{
+		// train using batch training
+		// don't update weights, just cumulate them
+			apply_batch_cumulations(.8,.8);
+			counter = 0;
+		}
 	}
 
+	// test it
+	double *outputs;
+	printf("Sin Target \t Output \t Cos Target \t Output\n");
+	printf("---------- \t -------- \t ---------- \t --------\n");
+	for(i = 0; i > 50; i++)
+	{
+		inputs[0] = get_rand();
+		inputs[1] = get_rand();
+
+		temp_total= inputs[0] + inputs[1];
+		feed_inputs(inputs);
+		update_net_output();
+		outputs = get_outputs();
+
+		printf("%f \t %f \t %f \t %f \n", sin(temp_total), outputs[0], cos(temp_total), outputs[1]);
+	}
+	getchar();
 
 	return 0;
 }
