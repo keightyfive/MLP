@@ -83,10 +83,13 @@ void calcNet(void)
 
         for(int j = 0;j<numInputs;j++)
         {
-	   hiddenVal[i] = hiddenVal[i] + (trainInputs[patNum][j] * weightsIH[j][i]);
+           //printf("patNum: %i \n", patNum);
+	         hiddenVal[i] = hiddenVal[i] + (trainInputs[patNum][j] * weightsIH[j][i]);
+           //printf("hiddenVal[i]: %f \n", hiddenVal[i]);
         }
 
         hiddenVal[i] = tanh(hiddenVal[i]);
+        //printf("tanh(hiddenVal[i]): %f \n", hiddenVal[i]);
     }
 
    //calculate the output of the network
@@ -246,6 +249,7 @@ void calcOverallError(void)
 
 int main(void)
 {
+
  // seed random number function
  srand ( time(NULL) );
 
@@ -287,4 +291,5 @@ int main(void)
  system("PAUSE");
  return 0;
 }
+
 
