@@ -85,21 +85,25 @@ void initData(void)
     // an extra input valued 1 is also added
     // to act as the bias
 
+    // 0 XOR 0 = 0
     trainInputs[0][0] = -1;
     trainInputs[0][1] = -1;
     trainInputs[0][2] = -1; // bias
     trainOutput[0] = -1;
 
+	// 0 XOR 1 = 1
     trainInputs[1][0] = -1;
     trainInputs[1][1] = 1;
     trainInputs[1][2] = 1; // bias
     trainOutput[1] = 1;
 
+	// 1 XOR 0 = 1
     trainInputs[2][0] = 1;
     trainInputs[2][1] = -1;
     trainInputs[2][2] = 1; // bias
     trainOutput[2] = 1;
 
+	// 1 XOR 1 = 0
     trainInputs[3][0] = 1;
     trainInputs[3][1] = 1;
     trainInputs[3][2] = -1; // bias
