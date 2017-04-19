@@ -35,7 +35,6 @@ const int numEpochs = 5000;
 const double LR_IH = 0.7;
 const double LR_HO = 0.07;
 
-
 // functions
 void initWeights();
 void initData();
@@ -121,8 +120,7 @@ void initWeights(void)
 
     for(int i = 0; i < numInputs; i++)
     {
-     weightsIH[i][j] = (getRand() - 0.5) / 5;
-     //printf("Weight = %f\n", weightsIH[i][j]);
+     	weightsIH[i][j] = (getRand() - 0.5) / 5;
     }
   }
 
@@ -140,23 +138,18 @@ void trainNet(void)
 
         for(int j = 0; j < numInputs; j++)
         {
-           // printf("patNum: %i \n", patNum);
            hiddenVal[i] = hiddenVal[i] + (trainInputs[patNum][j] * weightsIH[j][i]);
-           // printf("hiddenVal[i]: %f \n", hiddenVal[i]);
         }
 
         hiddenVal[i] = tanh(hiddenVal[i]);
-        // printf("tanh(hiddenVal[i]): %f \n", hiddenVal[i]);
     }
 
    // calculate the output of the network
-   // the output neuron is linear
    outPred = 0.0;
 
    for(i = 0; i < numHidden; i++)
    {
     outPred = outPred + hiddenVal[i] * weightsHO[i];
-    // printf("outPred %f \n", outPred);
    }
     // calculate the error
     errThisPat = outPred - trainOutput[patNum];
@@ -187,18 +180,18 @@ void WeightChangesHO(void)
 {
    for(int k = 0; k < numHidden; k++)
    {
-    double weightChange = LR_HO * errThisPat * hiddenVal[k];
-    weightsHO[k] = weightsHO[k] - weightChange;
+		double weightChange = LR_HO * errThisPat * hiddenVal[k];
+    	weightsHO[k] = weightsHO[k] - weightChange;
 
-    //regularisation on the output weights
-    if (weightsHO[k] < -5)
-    {
-     	weightsHO[k] = -5;
-    }
-    else if (weightsHO[k] > 5)
-    {
-     	weightsHO[k] = 5;
-    }
+    	//regularisation on the output weights
+    	if (weightsHO[k] < -5)
+    	{
+     		weightsHO[k] = -5;
+    	}
+    	else if (weightsHO[k] > 5)
+    	{
+     		weightsHO[k] = 5;
+    	}
    }
  }
 
@@ -207,15 +200,16 @@ void WeightChangesHO(void)
 // calculate the overall error
 void calcOverallError(void)
 {
-     RMSerror = 0.0;
-     for(int i = 0; i < numPatterns; i++)
-        {
-         patNum = i;
-         trainNet();
-         RMSerror = RMSerror + (errThisPat * errThisPat);
-        }
-     RMSerror = RMSerror / numPatterns;
-     RMSerror = sqrt(RMSerror);
+    RMSerror = 0.0;
+    for(int i = 0; i < numPatterns; i++)
+    {
+        patNum = i;
+        trainNet();
+        RMSerror = RMSerror + (errThisPat * errThisPat);
+    }
+
+    RMSerror = RMSerror / numPatterns;
+    RMSerror = sqrt(RMSerror);
 }
 
 
@@ -269,7 +263,6 @@ int main(void)
         // display the overall network error
         calcOverallError();
 
-        // printf("errThisPat %f \n", errThisPat);
         printf("epoch = %d RMS Error = %f\n", j, RMSerror);
     }
 
