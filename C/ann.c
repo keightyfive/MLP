@@ -68,6 +68,62 @@ int trainOutput[numPatterns];
 //************** function definitions **************************
 //==============================================================
 
+//************************************
+// generates a random number
+double getRand(void)
+{
+	return ((double)rand()) / (double)RAND_MAX;
+}
+
+//************************************
+// read in the data
+void initData(void)
+{
+    printf("initialising data\n");
+
+    // the data here is the XOR input and output data
+    // an extra input valued 1 is also added
+    // to act as the bias
+
+    trainInputs[0][0] = -1;
+    trainInputs[0][1] = -1;
+    trainInputs[0][2] = -1; // bias
+    trainOutput[0] = -1;
+
+    trainInputs[1][0] = -1;
+    trainInputs[1][1] = 1;
+    trainInputs[1][2] = 1; // bias
+    trainOutput[1] = 1;
+
+    trainInputs[2][0] = 1;
+    trainInputs[2][1] = -1;
+    trainInputs[2][2] = 1; // bias
+    trainOutput[2] = 1;
+
+    trainInputs[3][0] = 1;
+    trainInputs[3][1] = 1;
+    trainInputs[3][2] = -1; // bias
+    trainOutput[3] = -1;
+}
+
+//************************************
+// set weights to random numbers 
+void initWeights(void)
+{
+
+ for(int j = 0; j < numHidden; j++)
+ {
+    weightsHO[j] = (getRand() - 0.5) / 2;
+
+    for(int i = 0; i < numInputs; i++)
+    {
+     weightsIH[i][j] = (getRand() - 0.5) / 5;
+     //printf("Weight = %f\n", weightsIH[i][j]);
+    }
+  }
+
+}
+
 //***********************************
 // calculates the network output
 void trainNet(void)
@@ -104,6 +160,24 @@ void trainNet(void)
 
 
 //************************************
+// adjust the weights input-hidden
+void WeightChangesIH(void)
+{
+  for(int i = 0; i < numHidden; i++)
+  {
+     for(int k = 0; k < numInputs; k++)
+     {
+        double x = 1 - (hiddenVal[i] * hiddenVal[i]);
+        x = x * weightsHO[i] * errThisPat * LR_IH;
+        x = x * trainInputs[patNum][k];
+        double weightChange = x;
+        weightsIH[k][i] = weightsIH[k][i] - weightChange;
+     }
+  }
+}
+
+
+//************************************
 // adjust the weights hidden-output
 void WeightChangesHO(void)
 {
@@ -126,77 +200,20 @@ void WeightChangesHO(void)
 
 
 //************************************
-// adjust the weights input-hidden
-void WeightChangesIH(void)
+// calculate the overall error
+void calcOverallError(void)
 {
-  for(int i = 0; i < numHidden; i++)
-  {
-     for(int k = 0; k < numInputs; k++)
-     {
-        double x = 1 - (hiddenVal[i] * hiddenVal[i]);
-        x = x * weightsHO[i] * errThisPat * LR_IH;
-        x = x * trainInputs[patNum][k];
-        double weightChange = x;
-        weightsIH[k][i] = weightsIH[k][i] - weightChange;
-     }
-  }
+     RMSerror = 0.0;
+     for(int i = 0; i < numPatterns; i++)
+        {
+         patNum = i;
+         trainNet();
+         RMSerror = RMSerror + (errThisPat * errThisPat);
+        }
+     RMSerror = RMSerror / numPatterns;
+     RMSerror = sqrt(RMSerror);
 }
 
-//************************************
-// generates a random number
-double getRand(void)
-{
- return ((double)rand()) / (double)RAND_MAX;
-}
-
-//************************************
-// set weights to random numbers 
-void initWeights(void)
-{
-
- for(int j = 0; j < numHidden; j++)
- {
-    weightsHO[j] = (getRand() - 0.5) / 2;
-
-    for(int i = 0; i < numInputs; i++)
-    {
-     weightsIH[i][j] = (getRand() - 0.5) / 5;
-     //printf("Weight = %f\n", weightsIH[i][j]);
-    }
-  }
-
-}
-
-//************************************
-// read in the data
-void initData(void)
-{
-    printf("initialising data\n");
-
-    // the data here is the XOR input and output data
-    // an extra input valued 1 is also added
-    // to act as the bias
-
-    trainInputs[0][0] = 1;
-    trainInputs[0][1] = -1;
-    trainInputs[0][2] = 1; // bias
-    trainOutput[0] = 1;
-
-    trainInputs[1][0] = -1;
-    trainInputs[1][1] = 1;
-    trainInputs[1][2] = 1; // bias
-    trainOutput[1] = 1;
-
-    trainInputs[2][0] = 1;
-    trainInputs[2][1] = 1;
-    trainInputs[2][2] = -1; // bias
-    trainOutput[2] = -1;
-
-    trainInputs[3][0] = -1;
-    trainInputs[3][1] = -1;
-    trainInputs[3][2] = -1; // bias
-    trainOutput[3] = -1;
-}
 
 //************************************
 // display results
@@ -206,24 +223,9 @@ void displayResults(void)
   for(int i = 0; i < numPatterns; i++)
   {
      patNum = i;
-     //trainNet();
-     printf("trainOutput = %d outPred = %f\n", trainOutput[patNum], outPred);
+     trainNet();
+     printf("target output = %d, actual output = %f\n", trainOutput[patNum], outPred);
   }
-}
-
-//************************************
-// calculate the overall error
-void calcOverallError(void)
-{
-     RMSerror = 0.0;
-     for(int i = 0; i < numPatterns; i++)
-        {
-         patNum = i;
-         //trainNet();
-         RMSerror = RMSerror + (errThisPat * errThisPat);
-        }
-     RMSerror = RMSerror / numPatterns;
-     RMSerror = sqrt(RMSerror);
 }
 
 
