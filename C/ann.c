@@ -18,7 +18,7 @@ double cpu_time_used;
 
 // 12 input neurons
 #define numInputs 12
-// 120 neurons in hidden layer
+// 90 neurons in hidden layer
 #define numHidden 90
 // 4 sets of inputs paired with target outputs
 #define numPatterns 4
