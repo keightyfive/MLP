@@ -1,10 +1,10 @@
 /*
-name:   ann.c
-author: Kevin Klein
-date:   14/03/2017
-descr.: MLP (Multilayer Perceptron), also referred to as a feedforward artificial
-        neural network, using Backpropagation for supervised learning
-comp:   gcc -o ann ann.c -lm  
+name:    ann.c
+author:  Kevin Klein
+date:    14/03/2017
+descr.:  MLP (Multilayer Perceptron) using Backpropagation for
+		 supervised learning to approximate XOR problem 
+compile: gcc -o ann ann.c -lm  
 */
 
 //#include <iostream.h>
@@ -173,31 +173,28 @@ void initData(void)
 {
     printf("initialising data\n");
 
-    // the data here is the XOR data
-    // it has been rescaled to the range
-    // [-1][1]
+    // the data here is the XOR input and output data
     // an extra input valued 1 is also added
     // to act as the bias
-    // the output must lay in the range -1 to 1
 
-    trainInputs[0][0]  = 1;
-    trainInputs[0][1]  = -1;
-    trainInputs[0][2]  = 1;    //bias
+    trainInputs[0][0] = 1;
+    trainInputs[0][1] = -1;
+    trainInputs[0][2] = 1; // bias
     trainOutput[0] = 1;
 
-    trainInputs[1][0]  = -1;
-    trainInputs[1][1]  = 1;
-    trainInputs[1][2]  = 1;       //bias
+    trainInputs[1][0] = -1;
+    trainInputs[1][1] = 1;
+    trainInputs[1][2] = 1; // bias
     trainOutput[1] = 1;
 
-    trainInputs[2][0]  = 1;
-    trainInputs[2][1]  = 1;
-    trainInputs[2][2]  = -1;        //bias
+    trainInputs[2][0] = 1;
+    trainInputs[2][1] = 1;
+    trainInputs[2][2] = -1; // bias
     trainOutput[2] = -1;
 
-    trainInputs[3][0]  = -1;
-    trainInputs[3][1]  = -1;
-    trainInputs[3][2]  = -1;     //bias
+    trainInputs[3][0] = -1;
+    trainInputs[3][1] = -1;
+    trainInputs[3][2] = -1; // bias
     trainOutput[3] = -1;
 }
 
@@ -272,16 +269,16 @@ int main(void)
        printf("epoch = %d RMS Error = %f\n", j, RMSerror);
     }
 
- // training has finished
- // display the results
- displayResults();
+ 	// training has finished
+ 	// display the results
+ 	displayResults();
 
- // time elapsed
- end = clock();
- cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
- printf("----------------------------------\n");
- printf("cpu time: %f sec \n", cpu_time_used);
- printf("----------------------------------\n");
+	 // time elapsed
+ 	end = clock();
+ 	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+ 	printf("----------------------------------\n");
+ 	printf("cpu time: %f sec \n", cpu_time_used);
+ 	printf("----------------------------------\n");
 
  return 0;
 }
