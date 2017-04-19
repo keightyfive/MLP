@@ -13,6 +13,8 @@ comp:   gcc -o ann ann.c -lm
 #include <time.h>
 #include <math.h>
 
+clock_t start, end;
+double cpu_time_used;
 
 // 12 input neurons
 #define numInputs 12
@@ -243,6 +245,8 @@ int main(void)
  // load in the data
  initData();
 
+ start = clock();
+ 
  // train the network
     for(int j = 0; j <= numEpochs; j++)
     {
@@ -271,6 +275,13 @@ int main(void)
  // training has finished
  // display the results
  displayResults();
+
+ // time elapsed
+ end = clock();
+ cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+ printf("----------------------------------\n");
+ printf("cpu time: %f sec \n", cpu_time_used);
+ printf("----------------------------------\n");
 
  return 0;
 }
