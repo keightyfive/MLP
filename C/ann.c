@@ -19,7 +19,7 @@ double cpu_time_used;
 // 12 input neurons
 #define numInputs 12
 // 120 neurons in hidden layer
-#define numHidden 120
+#define numHidden 90
 // 4 sets of inputs paired with target outputs
 #define numPatterns 4
 // XOR problem:
@@ -249,24 +249,22 @@ int main(void)
     {
         for(int i = 0; i < numPatterns; i++)
         {
-          // select a pattern at random
+          // select one of the input-output patterns for learning
           patNum = rand() % numPatterns;
 
-          // calculate the current network output
-          // and error for this pattern
+          // calculate output and error for this pattern
           trainNet();
 
-          // change network weights
+          // change the weights
           WeightChangesHO();
           WeightChangesIH();
         }
 
         // display the overall network error
-        // after each epoch
         calcOverallError();
 
-       printf("errThisPat %f \n", errThisPat);
-       printf("epoch = %d RMS Error = %f\n", j, RMSerror);
+        // printf("errThisPat %f \n", errThisPat);
+        printf("epoch = %d RMS Error = %f\n", j, RMSerror);
     }
 
  	// training has finished
