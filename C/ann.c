@@ -52,14 +52,14 @@ double errThisPat = 0.0;
 double outPred = 0.0;
 double RMSerror = 0.0;
 
-// the outputs of the hidden neurons
+// ouput value in hidden layer
 double hiddenVal[numHidden];
 
-// the weights
+// weights
 double weightsIH[numInputs][numHidden];
 double weightsHO[numHidden];
 
-// the data
+// input and output data
 int trainInputs[numPatterns][numInputs];
 int trainOutput[numPatterns];
 
