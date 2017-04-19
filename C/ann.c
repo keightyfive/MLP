@@ -14,9 +14,9 @@ comp:   gcc -o ann ann.c -lm
 #include <math.h>
 
 
-// 3 input neurons
+// 12 input neurons
 #define numInputs 12
-// number of neorons in hidden layer
+// 120 neurons in hidden layer
 #define numHidden 120
 // 4 sets of inputs paired with target outputs
 #define numPatterns 4
