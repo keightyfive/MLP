@@ -1,0 +1,213 @@
+/*
+name:	ann2.sac
+author: Kevin Klein
+date:	14/03/2017
+descr.:	MLP (Multilayer Perceptron), also referred to as a feedforward artificial
+ 		neural network, using Backpropagation for supervised learning
+comp: 	sac2c -o ann2 ann2.sac
+*/	
+
+use StdIO: all;
+use Array: all;
+use CommandLine: all;
+use Benchmarking: all;
+//use RTClock: all;
+//use RTimer: all;
+
+//double getRand();
+// SaC random function
+external double random(double MIN, double MAX);
+#pragma linkname "SACdrand"
+#pragma linksign [0,1,2]
+#pragma effect Rand::RandomGen
+
+
+int main()
+{
+	// 3 inputs nodes
+	numInputs = 3;
+	// 100 neurons in hidden layer
+	numHidden = 100;
+	// 4 sets of inputs paired with target outputs
+	numPatterns = 4;
+	// XOR patterns:
+	// 0,0 -> 0
+	// 0,1 -> 1
+	// 1,0 -> 1
+	// 1,1 -> 0
+
+	// number of training epochs
+	numEpochs = 5000;
+	// logistic regression values
+	LR_IH = 0.7;
+	LR_HO = 0.07;
+
+	// variables
+	patNum = 0;
+	errThisPat = 0.0;
+	outPred = 0.0;
+	RMSerror = 0.0;
+
+	// variables
+	patNum = 0;
+	errThisPat = 0.0;
+	outPred = 0.0;
+	RMSerror = 0.0;
+
+	// ouput values in hidden layer
+	hiddenVal = genarray([numHidden], 0.0);
+	
+	// weights
+	weightsIH = genarray([numInputs,numHidden], 0d);
+	weightsHO = genarray([numHidden], 0d);
+
+	// supervised traing data (input sets with corresponding desired output)
+	trainInputs = genarray([numPatterns,numInputs], 0);
+	trainOutput = genarray([numPatterns], 0);
+
+	//************************************
+	// calling functions
+	trainInputs = reshape([numPatterns,numInputs], [-1,-1,-1, -1,1,1, 1,-1,1, 1,1,-1]);
+	trainOutput = reshape([numPatterns], [-1,1,1,-1]);
+
+	// init data
+	//print(trainInputs);
+	//print(trainOutput);
+
+	// get random values
+	min = 0.1;
+	max = 0.9;
+
+	//************************************
+	// init weights with random values
+	for(j = 0; j < numHidden; j++)
+	{
+		weightsHO = modarray(weightsHO, [j], (random(min,max) - 0.5) * 0.2);
+		
+		// loop through no of inputs
+		for(i = 0; i < numInputs; i++)
+		{
+			weightsIH = modarray(weightsIH, [i,j], (random(min, max) - 0.5) * 0.5);
+		}	
+	}
+
+	//print(weightsHO);
+	//print(weightsIH);
+
+	interval = getInterval( "work", 0);
+	start(interval);
+
+	// train the network
+    for(j = 0; j <= numEpochs; j++)
+    {
+    	for(i = 0; i < numPatterns; i++)
+        {
+        	minPatt = 0.0;
+			maxPatt = 3.0;
+
+        	// select one of the input-output patterns for learning
+        	patNum = toi(random(minPatt, maxPatt)) % numPatterns;
+        	//print(patNum);
+
+        	// trainNet() 
+        	//***********************************
+        	for(k = 0; k < numHidden; k++)
+        	{
+
+        		hiddenVal[k] = 0.0;
+
+        		for(m = 0; m < numInputs; m++)
+        		{
+
+        			hiddenVal[k] = hiddenVal[k] + (tod(trainInputs[patNum][m]) * tod(weightsIH[m][k]));
+        			//printf("-------\n");
+        			//print(hiddenVal);
+        		}
+        	}
+
+        	// calculate the output of the network
+   			outPred = 0.0;
+
+   			for(l = 0; l < numHidden; l++)	
+   			{
+   				outPred = outPred + hiddenVal[l] * weightsHO[l];
+   			}
+
+   			// calculate the error
+    		errThisPat = tod(outPred) - tod(trainOutput[patNum]);
+
+          	// change the weights
+          	// weightChangesHO();
+          	//***********************************
+          	// adjust the weights input-hidden
+    		for(z = 0; z < numHidden; z++)
+   			{
+   				weightChange = LR_HO * errThisPat * hiddenVal[z];
+   				weightsHO[z] = weightsHO[z] - weightChange;
+
+   				// regularisation on the output weights
+    			if(weightsHO[z] < -5.0)
+    			{
+     				weightsHO[z] = -5.0;
+    			}
+    			else if(weightsHO[z] > 5.0)
+    			{
+     				weightsHO[z] = 5.0;
+    			}
+   			}
+
+          	//weightChangesIH();
+          	//************************************
+			// adjust the weights input-hidden
+   			for(u = 0; u < numHidden; u++)
+  			{
+     			for(t = 0; t < numInputs; t++)
+     			{
+     				weightChange = 0.0;
+     				weightChange = 1.0 - (hiddenVal[u] * hiddenVal[u]);
+     				weightChange = weightChange * weightsHO[u] * errThisPat * LR_IH;
+     				weightChange = weightChange * tod(trainInputs[patNum][t]);
+     				//print(weightChange);
+     				weightsIH = modarray(weightsIH, [t,u], weightsIH[t,u] - weightChange);
+     				//print(weightsIH);
+        		}
+    		}
+
+		}//for(i = 0; i < numPatterns; i++)
+
+		//************************************
+		// calculate the overall error
+		//void calcOverallError(void)
+    	RMSerror = 0.0;
+    	for(p = 0; p < numPatterns; p++)
+    	{
+        	patNum = p;
+        	//trainNet();
+        	RMSerror = RMSerror + (errThisPat * errThisPat);
+    	}
+
+    	RMSerror = RMSerror / tod(numPatterns);
+    	//RMSerror = sqrt(RMSerror);
+
+    	// printf("errThisPat %f \n", errThisPat);
+        printf("epoch = %d RMS Error = %f\n", j, RMSerror);
+    	
+	}//for(j = 0; j <= numEpochs; j++)
+	
+	end(interval);
+
+	//************************************
+	// display results
+	
+  	printf("---------------------------------- \n");
+  	for(i = 0; i < numPatterns; i++)
+  	{
+    	patNum = i;
+    	//trainNet();
+    	printf("target output = %d, actual output = %f\n", trainOutput[patNum], outPred);
+  	}
+
+	printResult(interval);
+
+	return 0;
+}
