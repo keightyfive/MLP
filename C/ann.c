@@ -16,13 +16,13 @@ compile: gcc -o ann ann.c -lm
 clock_t start, end;
 double cpu_time_used;
 
-// 12 input neurons
-#define numInputs 12
+// 3 input neurons
+#define numInputs 3
 // 90 neurons in hidden layer
 #define numHidden 90
 // 4 sets of inputs paired with target outputs
 #define numPatterns 4
-// XOR problem:
+// XOR patterns:
 // 0,0 -> 0
 // 0,1 -> 1
 // 1,0 -> 1
@@ -35,12 +35,13 @@ const int numEpochs = 5000;
 const double LR_IH = 0.7;
 const double LR_HO = 0.07;
 
+
 // functions
 void initWeights();
 void initData();
 void trainNet();
-void WeightChangesHO();
-void WeightChangesIH();
+void weightChangesHO();
+void weightChangesIH();
 void calcOverallError();
 void displayResults();
 double getRand();
@@ -120,7 +121,8 @@ void initWeights(void)
 
     for(int i = 0; i < numInputs; i++)
     {
-     	weightsIH[i][j] = (getRand() - 0.5) / 5;
+     weightsIH[i][j] = (getRand() - 0.5) / 5;
+     //printf("Weight = %f\n", weightsIH[i][j]);
     }
   }
 
@@ -134,14 +136,17 @@ void trainNet(void)
     int i = 0;
     for(i = 0; i < numHidden; i++)
     {
-    hiddenVal[i] = 0.0;
+    	hiddenVal[i] = 0.0;
 
         for(int j = 0; j < numInputs; j++)
         {
+           // printf("patNum: %i \n", patNum);
            hiddenVal[i] = hiddenVal[i] + (trainInputs[patNum][j] * weightsIH[j][i]);
+           // printf("hiddenVal[i]: %f \n", hiddenVal[i]);
         }
 
         hiddenVal[i] = tanh(hiddenVal[i]);
+        // printf("tanh(hiddenVal[i]): %f \n", hiddenVal[i]);
     }
 
    // calculate the output of the network
@@ -150,6 +155,7 @@ void trainNet(void)
    for(i = 0; i < numHidden; i++)
    {
     outPred = outPred + hiddenVal[i] * weightsHO[i];
+    // printf("outPred %f \n", outPred);
    }
     // calculate the error
     errThisPat = outPred - trainOutput[patNum];
@@ -158,7 +164,7 @@ void trainNet(void)
 
 //************************************
 // adjust the weights input-hidden
-void WeightChangesIH(void)
+void weightChangesIH(void)
 {
   for(int i = 0; i < numHidden; i++)
   {
@@ -176,22 +182,22 @@ void WeightChangesIH(void)
 
 //************************************
 // adjust the weights hidden-output
-void WeightChangesHO(void)
+void weightChangesHO(void)
 {
    for(int k = 0; k < numHidden; k++)
    {
-		double weightChange = LR_HO * errThisPat * hiddenVal[k];
-    	weightsHO[k] = weightsHO[k] - weightChange;
+    double weightChange = LR_HO * errThisPat * hiddenVal[k];
+    weightsHO[k] = weightsHO[k] - weightChange;
 
-    	//regularisation on the output weights
-    	if (weightsHO[k] < -5)
-    	{
-     		weightsHO[k] = -5;
-    	}
-    	else if (weightsHO[k] > 5)
-    	{
-     		weightsHO[k] = 5;
-    	}
+    //regularisation on the output weights
+    if (weightsHO[k] < -5)
+    {
+     	weightsHO[k] = -5;
+    }
+    else if (weightsHO[k] > 5)
+    {
+     	weightsHO[k] = 5;
+    }
    }
  }
 
@@ -228,7 +234,7 @@ void displayResults(void)
 
 
 //==============================================================
-//*********************  MAIN PROGRAM **************************
+//********** THIS IS THE MAIN PROGRAM **************************
 //==============================================================
 
 int main(void)
@@ -242,6 +248,7 @@ int main(void)
  // load in the data
  initData();
 
+ // start timer
  start = clock();
  
  // train the network
@@ -256,22 +263,23 @@ int main(void)
           trainNet();
 
           // change the weights
-          WeightChangesHO();
-          WeightChangesIH();
+          weightChangesHO();
+          weightChangesIH();
         }
 
         // display the overall network error
         calcOverallError();
 
+        // printf("errThisPat %f \n", errThisPat);
         printf("epoch = %d RMS Error = %f\n", j, RMSerror);
     }
 
- 	// training has finished
+    // training has finished
+ 	end = clock();
+
  	// display the results
  	displayResults();
-
-	 // time elapsed
- 	end = clock();
+ 	// time elapsed
  	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
  	printf("----------------------------------\n");
  	printf("cpu time: %f sec \n", cpu_time_used);
