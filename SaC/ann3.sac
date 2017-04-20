@@ -1,10 +1,10 @@
 /*
-name:	ann2.sac
+name:	ann3.sac
 author: Kevin Klein
 date:	14/03/2017
 descr.:	MLP (Multilayer Perceptron), also referred to as a feedforward artificial
  		neural network, using Backpropagation for supervised learning
-comp: 	sac2c -o ann2 ann2.sac
+comp: 	sac2c -o ann3 ann3.sac
 */	
 
 use StdIO: all;
@@ -114,7 +114,7 @@ int main()
     	for(i = 0; i < numPatterns; i++)
         {
         	minPatt = 0.0;
-			maxPatt = 3.0;
+			    maxPatt = 3.0;
 
         	// select one of the input-output patterns for learning
         	patNum = toi(random(minPatt, maxPatt)) % numPatterns;
@@ -130,6 +130,7 @@ int main()
         		for(m = 0; m < numInputs; m++)
         		{
 
+              //hiddenVal = {[a,b] -> sum(tod(trainInputs[[a,.]]) * tod(weightsIH[[.,b]]))};
         			hiddenVal[k] = hiddenVal[k] + (tod(trainInputs[patNum][m]) * tod(weightsIH[m][k]));
         			//printf("-------\n");
         			//print(hiddenVal);
