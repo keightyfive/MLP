@@ -20,12 +20,12 @@ double cpu_time_used;
 // number of input neurons
 #define NO_INPUT_NEURONS 3
 // number of neurons in hidden layer
-#define NO_HIDDEN_NEURONS 12
+#define NO_HIDDEN_NEURONS 8
 // 4 sets of inputs paired with their target outputs in XOR problem
 #define NO_PATTERNS 4
 
 // number of training epochs (iterations)
-const int no_epochs = 5000;
+const int no_epochs = 200;
 
 // logistic regression values for backpropagation
 const double LR_IH = 0.7;
