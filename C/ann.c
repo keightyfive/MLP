@@ -31,10 +31,11 @@ const int no_epochs = 200;
 const double LR_IH = 0.7;
 const double LR_HO = 0.07;
 
+// single output neuron
+double actual_output = 0.0;
 // other variables
 int pattern_no = 0;
 double pattern_error = 0.0;
-double actual_output = 0.0;
 double rms_error = 0.0;
 
 // vector to store results in hidden layer
