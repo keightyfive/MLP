@@ -2,8 +2,8 @@
 name:    ann.c
 author:  Kevin Klein
 date:    14/03/2017
-descr.:  MLP (Multilayer Perceptron) using Backpropagation for
-		 supervised learning to approximate XOR problem 
+descr.:  ANN (Artificial Neural Network) using Backpropagation and
+		 supervised learning, learns XOR problem 
 compile: gcc -o ann ann.c -lm
 */
 
