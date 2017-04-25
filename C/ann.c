@@ -235,7 +235,7 @@ int main(void)
      	printf("target output = %d, actual output = %f\n", output_data[pattern_no], actual_output);
   	}
 
- 	// display time elapsed for trainging
+ 	// display time elapsed for training
  	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
  	printf("----------------------------------\n");
  	printf("time: %f sec \n", cpu_time_used);
