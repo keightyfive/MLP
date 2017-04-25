@@ -192,10 +192,10 @@ int main(void)
 	// seed random number function
  	srand(time(NULL));
 
- 	// initialise inputs and target ouputs
+ 	// initialise data set with inputs and target outputs for supervised learning
  	init_data();
 
- 	// initiate the weights with random values
+ 	// initialise the weights with random values
  	init_weights();
 
  	// start timer
