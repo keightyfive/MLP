@@ -66,7 +66,7 @@ double get_rand(void)
 // init input and output data to learn XOR problem
 void init_data(void)
 {
-    printf("initialising data\n");
+    printf("initialising data... \n");
 
     // 0 XOR 0 = 0
     input_data[0][0] = -1;	// input x
