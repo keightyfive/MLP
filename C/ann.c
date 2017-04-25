@@ -27,7 +27,7 @@ double cpu_time_used;
 // number of training epochs (iterations)
 const int no_epochs = 5000;
 
-// logistic regression values used for backpropagation
+// logistic regression values for backpropagation
 const double LR_IH = 0.7;
 const double LR_HO = 0.07;
 
@@ -44,7 +44,7 @@ double values_hidden_layer[NO_HIDDEN_NEURONS];
 double weights_IH[NO_INPUT_NEURONS][NO_HIDDEN_NEURONS];
 double weights_HO[NO_HIDDEN_NEURONS];
 
-// arrays to store traing data
+// arrays to store training data
 int input_data[NO_PATTERNS][NO_INPUT_NEURONS];
 int output_data[NO_PATTERNS];
 
@@ -69,8 +69,8 @@ void init_data(void)
 
     // 0 XOR 0 = 0
     input_data[0][0] = -1;	// input x
-    input_data[0][1] = -1; // input y
-    input_data[0][2] = 1;  // additional bias neuron
+    input_data[0][1] = -1; 	// input y
+    input_data[0][2] = 1;  	// additional bias neuron
     output_data[0] = -1;	// target output
 
 	// 0 XOR 1 = 1
@@ -95,7 +95,6 @@ void init_data(void)
 // init weights with random values
 void init_weights(void)
 {
-
 	for(int j = 0; j < NO_HIDDEN_NEURONS; j++)
  	{
     	weights_HO[j] = (get_rand() - 0.5) / 2;
@@ -110,39 +109,41 @@ void init_weights(void)
 // feed the data forward through the neural network
 void feed_forward(void)
 {
-    // calculate the outputs of the hidden neurons
     int i = 0;
     for(i = 0; i < NO_HIDDEN_NEURONS; i++)
     {
     	values_hidden_layer[i] = 0.0;
 
+    	// matrix multiplication of inputs and weights
         for(int j = 0; j < NO_INPUT_NEURONS; j++)
         {
-           values_hidden_layer[i] = values_hidden_layer[i] + (input_data[pattern_no][j] * weights_IH[j][i]);
+           values_hidden_layer[i] += input_data[pattern_no][j] * weights_IH[j][i];
         }
 
+        // activation function
         values_hidden_layer[i] = tanh(values_hidden_layer[i]);
     }
 
-   	// calculate the output of the network
+   	// value of output neuron
    	actual_output = 0.0;
 
    	for(i = 0; i < NO_HIDDEN_NEURONS; i++)
    	{
-   		actual_output = actual_output + values_hidden_layer[i] * weights_HO[i];
+   		actual_output += values_hidden_layer[i] * weights_HO[i];
    	}
-    // calculate the error for this pattern
+    // calculate error for this pattern
     pattern_error = actual_output - output_data[pattern_no];    	
 }
 
 // backpropagation algorithm to update the weights
 void backprop(void)
 {
-	// adjust the weights between hidden and output layer
+	// update weights between hidden and output layer
 	for(int m = 0; m < NO_HIDDEN_NEURONS; m++)
    	{
+   		// update weight matrix
    		double weightChange = LR_HO * pattern_error * values_hidden_layer[m];
-    	weights_HO[m] = weights_HO[m] - weightChange;
+    	weights_HO[m] -= weightChange;
 
     	// regularisation on the output weights
     	if(weights_HO[m] < -5)
@@ -155,13 +156,14 @@ void backprop(void)
     	}
    	}
 
-	// adjust the weights between input and hidden layer
+	// update weights between input and hidden layer
   	for(int i = 0; i < NO_HIDDEN_NEURONS; i++)
   	{
     	for(int k = 0; k < NO_INPUT_NEURONS; k++)
      	{
+     		// update weight matrix
         	double weightChange = ((1 - (values_hidden_layer[i] * values_hidden_layer[i])) * weights_HO[i] * pattern_error * LR_IH) * input_data[pattern_no][k];
-        	weights_IH[k][i] = weights_IH[k][i] - weightChange;
+        	weights_IH[k][i] -= weightChange;
      	}
   	}
 }
@@ -171,13 +173,15 @@ void calc_error(void)
 {
     rms_error = 0.0;
 
+    // calculate error for each pattern
     for(int i = 0; i < NO_PATTERNS; i++)
     {
         pattern_no = i;
         feed_forward();
-        rms_error = rms_error + (pattern_error * pattern_error);
+        rms_error += pattern_error * pattern_error;
     }
 
+    // square root error
     rms_error = sqrt(rms_error / NO_PATTERNS);
 }
 
@@ -201,14 +205,14 @@ int main(void)
     {
         for(int i = 0; i < NO_PATTERNS; i++)
         {
-          // select one of the patterns as input and target output
-          pattern_no = rand() % NO_PATTERNS;
+        	// select one of the patterns as input and target output
+          	pattern_no = rand() % NO_PATTERNS;
 
-          // feed the data forward
-          feed_forward();
+          	// feed the data forward
+          	feed_forward();
 
-          // update the weights
-          backprop();
+          	// update the weights
+          	backprop();
         }
 
         // calculate the overall network error
