@@ -17,9 +17,9 @@ compile: gcc -o ann ann.c -lm
 clock_t start, end;
 double cpu_time_used;
 
-// 3 input neurons
+// number of input neurons
 #define NO_INPUT_NEURONS 3
-// 100 neurons in hidden layer
+// number of neurons in hidden layer
 #define NO_HIDDEN_NEURONS 12
 // 4 sets of inputs paired with their target outputs in XOR problem
 #define NO_PATTERNS 4
