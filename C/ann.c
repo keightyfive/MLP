@@ -27,7 +27,7 @@ double cpu_time_used;
 // number of training epochs (iterations)
 const int no_epochs = 5000;
 
-// logistic regression values used for updating weights
+// logistic regression values used for backpropagation
 const double LR_IH = 0.7;
 const double LR_HO = 0.07;
 
@@ -53,7 +53,7 @@ double get_rand();
 void init_data();
 void init_weights();
 void feed_forward();
-void backprob();
+void backprop();
 void calc_error();
 
 // random number for first init of matrices
@@ -136,7 +136,7 @@ void feed_forward(void)
 }
 
 // backpropagation algorithm to update the weights
-void backprob(void)
+void backprop(void)
 {
 	// adjust the weights between hidden and output layer
 	for(int m = 0; m < NO_HIDDEN_NEURONS; m++)
@@ -208,7 +208,7 @@ int main(void)
           feed_forward();
 
           // update the weights
-          backprob();
+          backprop();
         }
 
         // calculate the overall network error
